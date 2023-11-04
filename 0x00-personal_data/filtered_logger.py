@@ -4,10 +4,12 @@ This module contains a function called filter_datum that
 filters sensitive data from a message based on specified fields and
 a class called RedactingFormatter.
 """
-from typing import List
+import mysql.connector
 import logging
+import os
 import re
-PII_FIELDS = ('email', 'phone', 'ssn', 'password', 'ip')
+from typing import List
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 class RedactingFormatter(logging.Formatter):
@@ -104,3 +106,20 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """
+    Establishes a connection to the personal data MySQL database.
+
+    Returns:
+            mysql.connector.connection.MySQLConnection: The database
+            connection object.
+    """
+    db_connection = mysql.connector.connect(
+        host=os.getenv('PERSONAL_DATA_DB_HOST'),
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD'),
+        database=os.getenv('PERSONAL_DATA_DB_NAME')
+    )
+    return db_connection
