@@ -117,9 +117,46 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
             connection object.
     """
     db_connection = mysql.connector.connect(
-        host=os.getenv('PERSONAL_DATA_DB_HOST'),
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD'),
+        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
         database=os.getenv('PERSONAL_DATA_DB_NAME')
     )
     return db_connection
+
+
+def main():
+    """
+    Retrieve all rows from the users table and display each row
+    under a filtered format.
+    """
+    # Establish a database connection
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+
+    # Query the users table
+    query = "SELECT * FROM users"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    # Configure the logger
+    logger = get_logger()
+
+    # Iterate over each row and log the filtered data
+    for row in rows:
+        filtered_row = '; '.join([f"{key}={value}" if key not in PII_FIELDS
+                                  else f"{key}={RedactingFormatter.REDACTION}"
+                                  for key, value in row.items()])
+
+        filtered_row += ';'
+
+        # Log the filtered row as an INFO-level message
+        logger.info(filtered_row)
+
+    # Close the cursor and database connection
+    cursor.close()
+    cnx.close()
+
+
+if __name__ == '__main__':
+    main()
