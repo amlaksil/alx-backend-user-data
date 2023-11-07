@@ -13,6 +13,7 @@ class BasicAuth(Auth):
     BasicAuth class extends the `Auth` class and provides methods for basic
     authentication.
     """
+
     def extract_base64_authorization_header(
             self, authorization_header: str) -> str:
         """
@@ -64,3 +65,34 @@ class BasicAuth(Auth):
             return decoded_bytes.decode('utf-8')
         except base64.binascii.Error:
             return None
+
+    def extract_user_credentials(
+            self, decoded_base64_authorization_header: str) -> (str, str):
+        """
+        Extracts the username and password from the decoded base64-encoded
+        authorization header.
+
+        Args:
+            decoded_base64_authorization_header (str): The decoded
+            base64-encoded authorization header value.
+
+        Returns:
+            tuple: A tuple containing the username and password extracted
+            from the decoded authorization header.
+
+        Notes:
+        - Returns (None, None) if `decoded_base64_authorization_header` is
+          None or not a string.
+        - Returns (None, None) if the decoded authorization header does not
+          contain a ':' character.
+        - Otherwise, returns a tuple containingthe extracted username and
+          password.
+        """
+
+        if decoded_base64_authorization_header is None\
+           or not isinstance(decoded_base64_authorization_header, str):
+            return (None, None)
+        if ':' not in decoded_base64_authorization_header:
+            return (None, None)
+        user_credentials = decoded_base64_authorization_header.split(':')
+        return user_credentials[0], user_credentials[1]
