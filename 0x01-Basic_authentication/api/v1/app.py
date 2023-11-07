@@ -28,6 +28,20 @@ def handle_unauthorized_error(error) -> str:
     return jsonify({"error": "Unauthorized"}), 401
 
 
+@app.errorhandler(403)
+def handle_forbidden_error(error) -> str:
+    """
+    Handle the 403 resource not allowed to access error.
+
+    Args:
+            error (Exception): The exception object representing the error.
+
+Returns:
+    str: JSON-encoded string containing the error message.
+    """
+    return jsonify({"error": "Forbidden"}), 403
+
+
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler

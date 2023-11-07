@@ -38,3 +38,18 @@ def unauthorized() -> None:
             None
     """
     abort(401)
+
+
+@app_views.route('/forbidden', strict_slashes=False)
+def forbidden() -> None:
+    """
+    Handle requests to the /forbidden endpoint.
+
+    Raises:
+            403: If the user is authenticated but not allowed to access
+            the resource.
+
+    Returns:
+            None
+    """
+    abort(403)
