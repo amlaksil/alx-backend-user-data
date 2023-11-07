@@ -25,7 +25,7 @@ def handle_unauthorized_error(error) -> str:
     Returns:
             str: JSON-encoded string containing the error message.
     """
-    return jsonify({"error": "Unauthorized"})
+    return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(404)
