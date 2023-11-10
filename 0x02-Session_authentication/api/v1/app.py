@@ -4,6 +4,7 @@ Route module for the API
 """
 from os import getenv
 from api.v1.auth.auth import Auth
+from api.v1.auth.session_auth import SessionAuth
 from api.v1.auth.basic_auth import BasicAuth
 from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
@@ -20,6 +21,8 @@ auth_type = getenv('AUTH_TYPE')
 if auth_type:
     if auth_type == 'basic_auth':
         auth = BasicAuth()
+    elif auth_type == 'session_auth':
+        auth = SessionAuth()
     else:
         auth = Auth()
 
@@ -67,8 +70,8 @@ def before_request():
     Notes:
         - The `auth` object is assumed to be an instance of the `Auth` class.
     """
-    request.current_user = auth.current_user(request)
     if auth:
+        request.current_user = auth.current_user(request)
         path = request.path
         paths = ['/api/v1/status/',
                  '/api/v1/unauthorized/', '/api/v1/forbidden/']
