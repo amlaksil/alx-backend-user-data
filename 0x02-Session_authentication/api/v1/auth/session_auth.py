@@ -4,6 +4,8 @@ This module contains a SessionAuth class for implementing
 session-based authentication.
 """
 from api.v1.auth.auth import Auth
+from models.user import User
+from typing import Optional
 import uuid
 
 
@@ -53,3 +55,23 @@ class SessionAuth(Auth):
             return None
 
         return self.user_id_by_session_id.get(session_id)
+
+    def current_user(self, request: Optional[object] = None) -> Optional[User]:
+        """
+        Return a User instance based on a cookie value.
+
+        Args:
+            request (object): The request object containing the cookie value.
+
+        Returns:
+            Optional[User]: The User instance associated with the cookie value.
+
+        Raises:
+            None.
+        """
+        session_id = self.session_cookie(request)
+        user_id = self.user_id_for_session_id(session_id)
+        if user_id is None:
+            return None
+
+        return User.get(user_id)
