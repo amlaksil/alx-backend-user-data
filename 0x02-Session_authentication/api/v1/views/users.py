@@ -14,6 +14,12 @@ def view_all_users() -> str:
       - list of all User objects JSON represented
     """
     all_users = [user.to_json() for user in User.all()]
+    if request.path == '/api/v1/users/me'\
+       or request.path == '/api/v1/users/me/':
+        user_t = {}
+        for user in all_users:
+            user_t.update(user)
+        return jsonify(user_t)
     return jsonify(all_users)
 
 
