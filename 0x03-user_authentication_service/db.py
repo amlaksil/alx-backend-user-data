@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import inspect
 from user import Base, User
 
 
@@ -18,7 +19,7 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
 
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
@@ -74,3 +75,28 @@ class DB:
         except InvalidRequestError as e:
             raise e
         return user
+
+    def update_user(self, user_id: int, **kwargs):
+        """
+        Updates user data based on their id.
+
+        Args:
+            - user_id (int): User Id.
+            - **kwargs (dict): Arbitrary keyword arguments represents the
+            user filed to be updated.
+
+        Returns:
+            - None: If everything works as expected.
+
+        Raises:
+            - ValueError: If an argument that does not correspond to a user
+            attribute is passed.
+        """
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if hasattr(user, key):
+                user.key = value
+                self._session.commit()
+            else:
+                raise ValueError
+        return None
