@@ -121,7 +121,7 @@ class Auth:
         except NoResultFound:
             pass
 
-    def destroy_session(self, user_id: int):
+    def destroy_session(self, user_id: int) -> None:
         """
         Updates the corresponding user's session ID to None.
 
@@ -132,3 +132,25 @@ class Auth:
             None
         """
         return self._db.update_user(user_id, session_id=None)
+
+    def get_reset_password_token(self, email: str) -> str:
+        """
+        Generate and retrieve a reset password token for the user with
+        the provided email.
+
+        Args:
+            email (str): The email of the user for whom to generate the
+            reset password token.
+
+        Returns:
+            str: The generated reset password token.
+
+        Raises:
+            ValueError: If no user is found with the provided email.
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            user.reset_toke = _generate_uuid()
+            return user.reset_token
+        except NoResultFound:
+            raise ValueError
