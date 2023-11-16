@@ -76,7 +76,7 @@ class DB:
             raise e
         return user
 
-    def update_user(self, user_id: int, **kwargs):
+    def update_user(self, user_id: int, **kwargs) -> None:
         """
         Updates user data based on their id.
 
@@ -96,7 +96,7 @@ class DB:
         for key, value in kwargs.items():
             if hasattr(user, key):
                 user.key = value
-                self._session.commit()
             else:
                 raise ValueError
+        self._session.commit()
         return None
