@@ -9,6 +9,7 @@ import bcrypt
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError
 from uuid import uuid4
 
 
@@ -49,6 +50,9 @@ class Auth:
 
         Returns:
             User (obj): A user object.
+
+        Raises:
+            ValueError: If a user already exists with the provided email.
         """
         try:
             self._db.find_user_by(email=email)
@@ -66,7 +70,7 @@ class Auth:
             password (str): User password.
 
         Returns:
-            bool: True if password matches otherwise False.
+            Boolean: True if password matches otherwise False.
         """
         try:
             user = self._db.find_user_by(email=email)
@@ -75,7 +79,7 @@ class Auth:
             if bcrypt.checkpw(password.encode('utf-8'), hashed_pwd):
                 return True
             return False
-        except NoResultFound:
+        except (NoResultFound, InvalidRequestError):
             return False
 
     def create_session(self, email: str) -> str:
@@ -123,5 +127,8 @@ class Auth:
 
         Args:
             user_id (int): User ID.
+
+        Returns:
+            None
         """
-        self._db.update_user(user_id, session_id=None)
+        return self._db.update_user(user_id, session_id=None)
