@@ -38,7 +38,7 @@ def log_in_wrong_password(email: str, password: str) -> None:
 
 def log_in(email: str, password: str) -> str:
     """
-    Validate login
+    Check
     """
     url = 'http://localhost:5000/sessions'
     data = {
@@ -51,13 +51,45 @@ def log_in(email: str, password: str) -> str:
     return session_id
 
 
-def profile_logged(session_id):
+def profile_logged(session_id) -> None:
     """
+    Check
     """
     url = 'http://localhost:5000/profile'
     data = {'session_id': session_id}
-    response = requests.post(url, data=data)
-    pass
+    response = requests.get(url, cookies=data)
+    assert response.json() == {'email': 'guillaume@holberton.io'}
+
+
+def log_out(session_id: str) -> None:
+    """
+    Check
+    """
+    url = 'http://localhost:5000/sessions'
+    data = {'session_id': session_id}
+
+    response = requests.delete(url, cookies=data)
+    assert response.status_code == 200
+
+
+def reset_password_token(email: str) -> str:
+    """
+    Check
+    """
+    url = 'http://localhost:5000/reset_password'
+    response = requests.post(url, data={'email': email})
+
+    assert response.status_code == 200
+    return response.json()['reset_token']
+
+
+def update_password(email: str, reset_token: str, new_password: str) -> None:
+    """
+    """
+    url = 'http://localhost:5000/reset_password'
+    response = requests.put(url)
+
+    assert response.status_code == 200
 
 
 EMAIL = "guillaume@holberton.io"
@@ -70,3 +102,6 @@ if __name__ == "__main__":
     register_user(EMAIL, PASSWD)
     log_in_wrong_password(EMAIL, NEW_PASSWD)
     session_id = log_in(EMAIL, PASSWD)
+    profile_logged(session_id)
+    log_out(session_id)
+    reset_token = reset_password_token(EMAIL)
