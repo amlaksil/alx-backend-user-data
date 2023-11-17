@@ -2,7 +2,7 @@
 
 from auth import Auth
 from flask import Flask, jsonify, request, abort, redirect
-from db import DB
+from sqlalchemy.orm.exc import NoResultFound
 
 AUTH = Auth()
 
@@ -82,6 +82,27 @@ def profile():
     if user is None:
         abort(403)
     return jsonify({"email": user.email}), 200
+
+
+@app.route('/reset_password', methods=['POST'])
+def get_reset_password_token() -> str:
+    """
+    Endpoint to generate a reset password token for a given email.
+
+    Args:
+        email (str): The email of the user requesting the password reset.
+
+    Returns:
+        - JSON response containing the email and reset_token if successful.
+        - HTTP status code 200 (OK) on success.
+        - HTTP status code 403 (Forbidden) if the email does not exist.
+    """
+    email = request.form.get('email')
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": reset_token}), 200
+    except NoResultFound:
+        abort(403)
 
 
 if __name__ == "__main__":
