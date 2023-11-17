@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-
+"""
+This module contains a Flask app that provides different endpoints
+to register, login, logout, find user based on session id, generate
+a reset password token, and to update the password.
+"""
 from auth import Auth
 from flask import Flask, jsonify, request, abort, redirect
 
@@ -72,7 +76,7 @@ def logout() -> str:
 
 
 @app.route('/profile', methods=['GET'])
-def profile():
+def profile() -> str:
     """
     Profile route to find the user based on session_id.
     """
